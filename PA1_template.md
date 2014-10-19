@@ -14,12 +14,15 @@ output:
 data <- read.csv("activity.csv", colClasses=c("numeric", "Date", "numeric"))
 ```
 
+
 ## What is mean total number of steps taken per day?
 
 
 ```r
 library(plyr)
-sum_steps <- ddply(data,c("date"),summarize,total_steps=sum(steps))
+
+# calculate the total steps per date
+sum_steps <- ddply(data, c("date"), summarize,total_steps=sum(steps))
 hist(sum_steps$total_steps,
      xlab = "Number of Steps",
      main = "Histogram of the Total No. of Steps Taken Each Day",
@@ -32,14 +35,19 @@ hist(sum_steps$total_steps,
 mean_ <- mean(sum_steps$total_steps, na.rm = T)
 median_ <- median(sum_steps$total_steps, na.rm = T)
 ```
-The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>.
-The median total number of steps taken per day is 1.0765 &times; 10<sup>4</sup>.
+
+The mean total number of steps taken per day is 10766.19.
+
+The median total number of steps taken per day is 10765.
+
 
 ## What is the average daily activity pattern?
 
 
 ```r
 library(plyr)
+
+# calculate the mean steps per interval across all dates
 mean_data <- ddply(data,
                    c("interval"),
                    summarize,
@@ -54,25 +62,32 @@ plot(mean_data$interval,
 ![plot of chunk aveDailyPattern](figures/aveDailyPattern-1.png) 
 
 ```r
+# getting 5-Min interval with the maximum average number of steps
 max_row <- mean_data[mean_data$mean_steps == max(mean_data$mean_steps), ]
 max_5 <- max_row[, c("interval")]
 max_5_val <- max_row[, c("mean_steps")]
 ```
 
+
 835 is the 5-min interval that contains the maximum number of steps, with the value
-of 206.1698113 (on average across all the days).
+of 206.17 (on average across all the days).
+
 
 ## Imputing missing values
 
 
 ```r
+# original row count - row count with missing data omitted
 na_count <- nrow(data) - nrow(na.omit(data))
 ```
-The total number of missing values in the dataset is 2304.
+
+The total number of missing values in the dataset is 2304 (number of rows with NAs).
 
 
 ```r
 library(plyr)
+
+# Strategy for filling in of missing values in dataset
 new_data <- transform(data, 
                       steps = ifelse(is.na(steps), 
                                      floor(ave(steps,
@@ -82,7 +97,10 @@ new_data <- transform(data,
 
 new_na_count <- nrow(data) - nrow(na.omit(new_data))
 
-new_sum_steps <- ddply(new_data,.(date),summarize,total_steps=sum(steps, na.rm = F))
+new_sum_steps <- ddply(new_data,
+                       c("date"),
+                       summarize,
+                       total_steps=sum(steps, na.rm = F))
 
 hist(new_sum_steps$total_steps,
      xlab = "Number of Steps",
@@ -93,26 +111,28 @@ hist(new_sum_steps$total_steps,
 ![plot of chunk imputeMissingValues](figures/imputeMissingValues-1.png) 
 
 ```r
-new_mean <- round(mean(new_sum_steps$total_steps, na.rm = T), 2)
-new_median <- round(median(new_sum_steps$total_steps, na.rm = T), 2)
+new_mean <- mean(new_sum_steps$total_steps, na.rm = T)
+new_median <- median(new_sum_steps$total_steps, na.rm = T)
 ```
 
-The new mean total number of steps taken per day is 1.074977 &times; 10<sup>4</sup>.
-The new median total number of steps taken per day is 1.0641 &times; 10<sup>4</sup>.
+
+The new mean total number of steps taken per day is 10749.77.
+The new median total number of steps taken per day is 10641.
 Both of these are different from the first computed values with still missing data.
 The imputation affected the estimates of the total daily number of steps,
 thus adding more amount of information available for the analysis.
 
+
 ## Are there differences in activity patterns between weekdays and weekends?
 
-### "Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken
-### (Across All Weekend or Weekday Days)"
+#### "Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken (Across All Weekend or Weekday Days)"
 
 
 ```r
 library(plyr)
 library(ggplot2)
 
+# New factor variable: whether a data is weekday or weekend
 new_data$weekDayEnd <- ifelse(!weekdays(as.Date(new_data$date)) %in% c("Saturday", "Sunday"),
                               "weekday", "weekend")
 

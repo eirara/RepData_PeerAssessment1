@@ -171,7 +171,9 @@ hr {
 <h2>What is mean total number of steps taken per day?</h2>
 
 <pre><code class="r">library(plyr)
-sum_steps &lt;- ddply(data,c(&quot;date&quot;),summarize,total_steps=sum(steps))
+
+# calculate the total steps per date
+sum_steps &lt;- ddply(data, c(&quot;date&quot;), summarize,total_steps=sum(steps))
 hist(sum_steps$total_steps,
      xlab = &quot;Number of Steps&quot;,
      main = &quot;Histogram of the Total No. of Steps Taken Each Day&quot;,
@@ -184,12 +186,15 @@ hist(sum_steps$total_steps,
 median_ &lt;- median(sum_steps$total_steps, na.rm = T)
 </code></pre>
 
-<p>The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>.
-The median total number of steps taken per day is 1.0765 &times; 10<sup>4</sup>.</p>
+<p>The mean total number of steps taken per day is 10766.19.</p>
+
+<p>The median total number of steps taken per day is 10765.</p>
 
 <h2>What is the average daily activity pattern?</h2>
 
 <pre><code class="r">library(plyr)
+
+# calculate the mean steps per interval across all dates
 mean_data &lt;- ddply(data,
                    c(&quot;interval&quot;),
                    summarize,
@@ -203,22 +208,26 @@ plot(mean_data$interval,
 
 <p><img src="figures/aveDailyPattern-1.png" alt="plot of chunk aveDailyPattern"> </p>
 
-<pre><code class="r">max_row &lt;- mean_data[mean_data$mean_steps == max(mean_data$mean_steps), ]
+<pre><code class="r"># getting 5-Min interval with the maximum average number of steps
+max_row &lt;- mean_data[mean_data$mean_steps == max(mean_data$mean_steps), ]
 max_5 &lt;- max_row[, c(&quot;interval&quot;)]
 max_5_val &lt;- max_row[, c(&quot;mean_steps&quot;)]
 </code></pre>
 
 <p>835 is the 5-min interval that contains the maximum number of steps, with the value
-of 206.1698113 (on average across all the days).</p>
+of 206.17 (on average across all the days).</p>
 
 <h2>Imputing missing values</h2>
 
-<pre><code class="r">na_count &lt;- nrow(data) - nrow(na.omit(data))
+<pre><code class="r"># original row count - row count with missing data omitted
+na_count &lt;- nrow(data) - nrow(na.omit(data))
 </code></pre>
 
-<p>The total number of missing values in the dataset is 2304.</p>
+<p>The total number of missing values in the dataset is 2304 (number of rows with NAs).</p>
 
 <pre><code class="r">library(plyr)
+
+# Strategy for filling in of missing values in dataset
 new_data &lt;- transform(data, 
                       steps = ifelse(is.na(steps), 
                                      floor(ave(steps,
@@ -228,7 +237,10 @@ new_data &lt;- transform(data,
 
 new_na_count &lt;- nrow(data) - nrow(na.omit(new_data))
 
-new_sum_steps &lt;- ddply(new_data,.(date),summarize,total_steps=sum(steps, na.rm = F))
+new_sum_steps &lt;- ddply(new_data,
+                       c(&quot;date&quot;),
+                       summarize,
+                       total_steps=sum(steps, na.rm = F))
 
 hist(new_sum_steps$total_steps,
      xlab = &quot;Number of Steps&quot;,
@@ -238,25 +250,24 @@ hist(new_sum_steps$total_steps,
 
 <p><img src="figures/imputeMissingValues-1.png" alt="plot of chunk imputeMissingValues"> </p>
 
-<pre><code class="r">new_mean &lt;- round(mean(new_sum_steps$total_steps, na.rm = T), 2)
-new_median &lt;- round(median(new_sum_steps$total_steps, na.rm = T), 2)
+<pre><code class="r">new_mean &lt;- mean(new_sum_steps$total_steps, na.rm = T)
+new_median &lt;- median(new_sum_steps$total_steps, na.rm = T)
 </code></pre>
 
-<p>The new mean total number of steps taken per day is 1.074977 &times; 10<sup>4</sup>.
-The new median total number of steps taken per day is 1.0641 &times; 10<sup>4</sup>.
+<p>The new mean total number of steps taken per day is 10749.77.
+The new median total number of steps taken per day is 10641.
 Both of these are different from the first computed values with still missing data.
 The imputation affected the estimates of the total daily number of steps,
 thus adding more amount of information available for the analysis.</p>
 
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>
 
-<h3>&quot;Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken</h3>
-
-<h3>(Across All Weekend or Weekday Days)&quot;</h3>
+<h4>&quot;Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken (Across All Weekend or Weekday Days)&quot;</h4>
 
 <pre><code class="r">library(plyr)
 library(ggplot2)
 
+# New factor variable: whether a data is weekday or weekend
 new_data$weekDayEnd &lt;- ifelse(!weekdays(as.Date(new_data$date)) %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;),
                               &quot;weekday&quot;, &quot;weekend&quot;)
 
