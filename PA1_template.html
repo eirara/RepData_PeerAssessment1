@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Loading and preprocessing the data</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h2>Loading and preprocessing the data</h2>
+
+<pre><code class="r">data &lt;- read.csv(&quot;activity.csv&quot;, colClasses=c(&quot;numeric&quot;, &quot;Date&quot;, &quot;numeric&quot;))
+</code></pre>
+
+<h2>What is mean total number of steps taken per day?</h2>
+
+<pre><code class="r">library(plyr)
+sum_steps &lt;- ddply(data,c(&quot;date&quot;),summarize,total_steps=sum(steps))
+hist(sum_steps$total_steps,
+     xlab = &quot;Number of Steps&quot;,
+     main = &quot;Histogram of the Total No. of Steps Taken Each Day&quot;,
+     col=&quot;yellow&quot;)
+</code></pre>
+
+<p><img src="figures/meanTotalNumberOfSteps-1.png" alt="plot of chunk meanTotalNumberOfSteps"> </p>
+
+<pre><code class="r">mean_ &lt;- mean(sum_steps$total_steps, na.rm = T)
+median_ &lt;- median(sum_steps$total_steps, na.rm = T)
+</code></pre>
+
+<p>The mean total number of steps taken per day is 1.0766189 &times; 10<sup>4</sup>.
+The median total number of steps taken per day is 1.0765 &times; 10<sup>4</sup>.</p>
+
+<h2>What is the average daily activity pattern?</h2>
+
+<pre><code class="r">library(plyr)
+mean_data &lt;- ddply(data,
+                   c(&quot;interval&quot;),
+                   summarize,
+                   mean_steps=mean(steps, na.rm = T))
+
+plot(mean_data$interval,
+     main = &quot;Time Series Plot of the 5-Minute Interval\nand the Average No. of Steps Taken\n(Across All Days)&quot;,
+     mean_data$mean_steps,
+     ylab = &quot;Ave. No. of Steps Taken&quot;, xlab = &quot;5-Minute Interval&quot;, type=&quot;l&quot;)
+</code></pre>
+
+<p><img src="figures/aveDailyPattern-1.png" alt="plot of chunk aveDailyPattern"> </p>
+
+<pre><code class="r">max_row &lt;- mean_data[mean_data$mean_steps == max(mean_data$mean_steps), ]
+max_5 &lt;- max_row[, c(&quot;interval&quot;)]
+max_5_val &lt;- max_row[, c(&quot;mean_steps&quot;)]
+</code></pre>
+
+<p>835 is the 5-min interval that contains the maximum number of steps, with the value
+of 206.1698113 (on average across all the days).</p>
+
+<h2>Imputing missing values</h2>
+
+<pre><code class="r">na_count &lt;- nrow(data) - nrow(na.omit(data))
+</code></pre>
+
+<p>The total number of missing values in the dataset is 2304.</p>
+
+<pre><code class="r">library(plyr)
+new_data &lt;- transform(data, 
+                      steps = ifelse(is.na(steps), 
+                                     floor(ave(steps,
+                                               interval,
+                                     FUN = function(x) mean(x, na.rm = TRUE))), 
+                                     steps))
+
+new_na_count &lt;- nrow(data) - nrow(na.omit(new_data))
+
+new_sum_steps &lt;- ddply(new_data,.(date),summarize,total_steps=sum(steps, na.rm = F))
+
+hist(new_sum_steps$total_steps,
+     xlab = &quot;Number of Steps&quot;,
+     main = &quot;Histogram of the Total No. of Steps Taken Each Day\n(Imputed Missing Data)&quot;,
+     col=&quot;red&quot;)
+</code></pre>
+
+<p><img src="figures/imputeMissingValues-1.png" alt="plot of chunk imputeMissingValues"> </p>
+
+<pre><code class="r">new_mean &lt;- round(mean(new_sum_steps$total_steps, na.rm = T), 2)
+new_median &lt;- round(median(new_sum_steps$total_steps, na.rm = T), 2)
+</code></pre>
+
+<p>The new mean total number of steps taken per day is 1.074977 &times; 10<sup>4</sup>.
+The new median total number of steps taken per day is 1.0641 &times; 10<sup>4</sup>.
+Both of these are different from the first computed values with still missing data.
+The imputation affected the estimates of the total daily number of steps,
+thus adding more amount of information available for the analysis.</p>
+
+<h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+
+<h3>&quot;Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken</h3>
+
+<h3>(Across All Weekend or Weekday Days)&quot;</h3>
+
+<pre><code class="r">library(plyr)
+library(ggplot2)
+
+new_data$weekDayEnd &lt;- ifelse(!weekdays(as.Date(new_data$date)) %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;),
+                              &quot;weekday&quot;, &quot;weekend&quot;)
+
+n_data &lt;- ddply(new_data, c(&quot;interval&quot;,&quot;weekDayEnd&quot;), summarize, mean_steps=mean(steps))
+
+print(ggplot(n_data, aes(interval, mean_steps)) + 
+      geom_line() + 
+      facet_grid(weekDayEnd~.) + 
+      xlab(&quot;Interval&quot;) +
+      ylab(&quot;Number of Steps&quot;))
+</code></pre>
+
+<p><img src="figures/weekEndDayActivity-1.png" alt="plot of chunk weekEndDayActivity"> </p>
+
+</body>
+
+</html>
