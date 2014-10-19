@@ -31,12 +31,13 @@ hist(sum_steps$total_steps,
 
 ![plot of chunk meanTotalNumberOfSteps](figures/meanTotalNumberOfSteps-1.png) 
 
+                Figure 1: Histogram of the Total No. of Steps Taken Each Day
+
+
 ```r
 mean_ <- mean(sum_steps$total_steps, na.rm = T)
 median_ <- median(sum_steps$total_steps, na.rm = T)
 ```
-
-                Figure 1: Histogram of the Total No. of Steps Taken Each Day
 
 
 The mean total number of steps taken per day is 10766.19.
@@ -64,14 +65,15 @@ plot(mean_data$interval,
 
 ![plot of chunk aveDailyPattern](figures/aveDailyPattern-1.png) 
 
+                Figure 2: Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken
+
+
 ```r
 # getting 5-Min interval with the maximum average number of steps
 max_row <- mean_data[mean_data$mean_steps == max(mean_data$mean_steps), ]
 max_5 <- max_row[, c("interval")]
 max_5_val <- max_row[, c("mean_steps")]
 ```
-
-                Figure 2: Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken
 
 
 835 is the 5-min interval that contains the maximum number of steps, with the value
