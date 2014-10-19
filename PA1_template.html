@@ -186,6 +186,9 @@ hist(sum_steps$total_steps,
 median_ &lt;- median(sum_steps$total_steps, na.rm = T)
 </code></pre>
 
+<pre><code>            Figure 1: Histogram of the Total No. of Steps Taken Each Day
+</code></pre>
+
 <p>The mean total number of steps taken per day is 10766.19.</p>
 
 <p>The median total number of steps taken per day is 10765.</p>
@@ -212,6 +215,9 @@ plot(mean_data$interval,
 max_row &lt;- mean_data[mean_data$mean_steps == max(mean_data$mean_steps), ]
 max_5 &lt;- max_row[, c(&quot;interval&quot;)]
 max_5_val &lt;- max_row[, c(&quot;mean_steps&quot;)]
+</code></pre>
+
+<pre><code>            Figure 2: Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken
 </code></pre>
 
 <p>835 is the 5-min interval that contains the maximum number of steps, with the value
@@ -250,6 +256,9 @@ hist(new_sum_steps$total_steps,
 
 <p><img src="figures/imputeMissingValues-1.png" alt="plot of chunk imputeMissingValues"> </p>
 
+<pre><code>            Figure 3: Histogram of the Total No. of Steps Taken Each Day (Imputed Missing Data)
+</code></pre>
+
 <pre><code class="r">new_mean &lt;- mean(new_sum_steps$total_steps, na.rm = T)
 new_median &lt;- median(new_sum_steps$total_steps, na.rm = T)
 </code></pre>
@@ -281,6 +290,11 @@ print(ggplot(n_data, aes(interval, mean_steps)) +
 </code></pre>
 
 <p><img src="figures/weekEndDayActivity-1.png" alt="plot of chunk weekEndDayActivity"> </p>
+
+<pre><code>                  Figure 4: Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken
+</code></pre>
+
+<p>Figure 4 above shows that there is a significant difference in the activity patterns between weekdays and weekends. </p>
 
 </body>
 

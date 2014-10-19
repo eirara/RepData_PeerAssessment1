@@ -36,6 +36,9 @@ mean_ <- mean(sum_steps$total_steps, na.rm = T)
 median_ <- median(sum_steps$total_steps, na.rm = T)
 ```
 
+                Figure 1: Histogram of the Total No. of Steps Taken Each Day
+
+
 The mean total number of steps taken per day is 10766.19.
 
 The median total number of steps taken per day is 10765.
@@ -67,6 +70,8 @@ max_row <- mean_data[mean_data$mean_steps == max(mean_data$mean_steps), ]
 max_5 <- max_row[, c("interval")]
 max_5_val <- max_row[, c("mean_steps")]
 ```
+
+                Figure 2: Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken
 
 
 835 is the 5-min interval that contains the maximum number of steps, with the value
@@ -110,6 +115,9 @@ hist(new_sum_steps$total_steps,
 
 ![plot of chunk imputeMissingValues](figures/imputeMissingValues-1.png) 
 
+                Figure 3: Histogram of the Total No. of Steps Taken Each Day (Imputed Missing Data)
+
+
 ```r
 new_mean <- mean(new_sum_steps$total_steps, na.rm = T)
 new_median <- median(new_sum_steps$total_steps, na.rm = T)
@@ -147,3 +155,7 @@ print(ggplot(n_data, aes(interval, mean_steps)) +
 
 ![plot of chunk weekEndDayActivity](figures/weekEndDayActivity-1.png) 
 
+                      Figure 4: Time Series Plot of the 5-Minute Interval and the Average No. of Steps Taken
+
+
+Figure 4 above shows that there is a significant difference in the activity patterns between weekdays and weekends. 
